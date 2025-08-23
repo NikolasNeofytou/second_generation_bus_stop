@@ -8,6 +8,7 @@
 | GTFS-RT feed listener | In Progress |
 | REST API: stops endpoint | Done |
 | REST API: routes endpoint | Done |
+| REST API: vehicles endpoint | Done |
 | REST API: arrivals endpoint | Not Started |
 | Unit and integration tests | Not Started |
 

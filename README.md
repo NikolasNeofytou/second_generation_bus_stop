@@ -4,7 +4,7 @@ This project aims to provide real-time bus information for Cyprus, including rou
 
 The repository currently contains:
 
-- `backend`: an Express + TypeScript server skeleton with `/stops` and `/routes` endpoints reading from ingested GTFS data
+- `backend`: an Express + TypeScript server skeleton with `/stops`, `/routes`, and `/vehicles` endpoints reading from ingested GTFS data
 - `frontend`: a Next.js + TypeScript application
 
 - `backend/src/gtfs/ingestStatic.ts`: downloads a GTFS static feed and writes routes and stops to JSON files

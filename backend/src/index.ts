@@ -19,6 +19,7 @@ function loadJson(filename: string) {
 
 const stops = loadJson('stops.json');
 const routes = loadJson('routes.json');
+const vehicles = loadJson('vehicles.json');
 
 app.get('/', (_req, res) => {
   res.send('Cyprus Bus Stop API');
@@ -30,6 +31,10 @@ app.get('/stops', (_req, res) => {
 
 app.get('/routes', (_req, res) => {
   res.json(routes);
+});
+
+app.get('/vehicles', (_req, res) => {
+  res.json(vehicles);
 });
 
 app.listen(port, () => {
