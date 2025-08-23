@@ -1,0 +1,25 @@
+version: '3.9'
+services:
+  db:
+    image: postgis/postgis:15-3.4
+    environment:
+      POSTGRES_DB: cybus
+      POSTGRES_USER: cybus
+      POSTGRES_PASSWORD: secret
+    ports:
+      - "5432:5432"
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+  backend:
+    build: ./backend
+    environment:
+      PORT: 3001
+      DATABASE_URL: postgres://cybus:secret@db:5432/cybus
+      REDIS_URL: redis://redis:6379
+    ports:
+      - "3001:3001"
+    depends_on:
+      - db
+      - redis
