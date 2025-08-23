@@ -1,0 +1,8 @@
+{
+  "name": "Cyprus Bus Stop",
+  "short_name": "BusStop",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "description": "Offline-capable bus stop app"
+}

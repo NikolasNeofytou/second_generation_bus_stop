@@ -5,7 +5,7 @@ This project aims to provide real-time bus information for Cyprus, including rou
 The repository currently contains:
 
 - `backend`: an Express + TypeScript server skeleton with `/stops`, `/routes`, `/vehicles`, `/alerts`, `/firmware/latest`, and `/arrivals/:stopId` endpoints reading from ingested GTFS data
-- `frontend`: a Next.js + TypeScript application featuring an `AlertsBanner` component and a map view with real-time vehicle positions
+- `frontend`: a Next.js + TypeScript application featuring an `AlertsBanner`, stop and route search with favourites, a map view with real-time vehicle positions, and basic offline support via a service worker
 - `firmware`: MicroPython prototype for the digital bus-stop display including boot-time configuration, periodic sync with the backend, offline handling, OTA update hooks, and a basic schedule/alerts renderer with brightness control
 
 - `backend/src/gtfs/ingestStatic.ts`: downloads a GTFS static feed and writes routes and stops to JSON files

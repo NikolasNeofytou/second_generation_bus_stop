@@ -2,6 +2,8 @@ import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import { useEffect, useState } from 'react';
 
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3001';
+
 interface Vehicle {
   id: string;
   lat: number;
@@ -15,7 +17,7 @@ export default function MapView() {
   useEffect(() => {
     const fetchVehicles = async () => {
       try {
-        const res = await fetch('http://localhost:3001/vehicles');
+        const res = await fetch(`${BACKEND_URL}/vehicles`);
         if (res.ok) {
           const data = await res.json();
           setVehicles(data);
