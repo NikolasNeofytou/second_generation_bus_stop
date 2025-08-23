@@ -1,8 +1,8 @@
 import Head from 'next/head';
 import React from 'react';
-import { useTranslation } from 'next-i18next';
-import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-import LanguageSwitcher from '../components/LanguageSwitcher';
+
+import AlertsBanner from '../components/AlertsBanner';
+
 
 export default function Home() {
   const { t } = useTranslation('common');
@@ -11,6 +11,7 @@ export default function Home() {
       <Head>
         <title>{t('title')}</title>
       </Head>
+      <AlertsBanner />
       <main>
         <h1>{t('heading')}</h1>
         <p>{t('comingSoon')}</p>
