@@ -8,5 +8,7 @@
 
 
   "english": "English",
-  "greek": "Ελληνικά"
+  "greek": "Ελληνικά",
+  "alertsError": "Could not load alerts. Please try again later.",
+  "searchPlaceholder": "Search stops"
 }
