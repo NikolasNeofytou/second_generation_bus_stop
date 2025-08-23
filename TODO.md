@@ -4,8 +4,8 @@
 | Task | Status |
 | --- | --- |
 | Set up Express TypeScript server | Done |
-| GTFS static data ingestion pipeline | In Progress |
-| GTFS-RT feed listener | Not Started |
+| GTFS static data ingestion pipeline | Done |
+| GTFS-RT feed listener | In Progress |
 | REST API endpoints for stops, routes, arrivals | Not Started |
 | Unit and integration tests | Not Started |
 
