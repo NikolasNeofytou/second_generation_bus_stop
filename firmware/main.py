@@ -49,9 +49,7 @@ def start_config_portal() -> dict:
         request = cl.recv(1024)
         request_str = request.decode()
         if "GET /save" in request_str:
-            _, params = request_str.split("?", 1)
-            params = params.split(" ")[0]
-            entries = {k: v for k, v in (p.split("=") for p in params.split("&"))}
+            entries = {unquote(k): unquote(v) for k, v in (p.split("=") for p in params.split("&"))}
             config = {
                 "ssid": entries.get("ssid", ""),
                 "password": entries.get("password", ""),
