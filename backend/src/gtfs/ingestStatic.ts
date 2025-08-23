@@ -41,17 +41,31 @@ async function ingest() {
   if (pool) {
     await pool.query('DELETE FROM stops');
     await pool.query('DELETE FROM routes');
-    for (const s of stops) {
-      await pool.query(
-        'INSERT INTO stops (stop_id, stop_name, stop_lat, stop_lon) VALUES ($1, $2, $3, $4)',
-        [s.stop_id, s.stop_name, s.stop_lat, s.stop_lon]
-      );
+    // Batch insert stops
+    if (stops.length > 0) {
+      const stopValues = [];
+      const stopParams = [];
+      let paramIdx = 1;
+      for (const s of stops) {
+        stopValues.push(`($${paramIdx}, $${paramIdx+1}, $${paramIdx+2}, $${paramIdx+3})`);
+        stopParams.push(s.stop_id, s.stop_name, s.stop_lat, s.stop_lon);
+        paramIdx += 4;
+      }
+      const stopInsertQuery = `INSERT INTO stops (stop_id, stop_name, stop_lat, stop_lon) VALUES ${stopValues.join(',')}`;
+      await pool.query(stopInsertQuery, stopParams);
     }
-    for (const r of routes) {
-      await pool.query(
-        'INSERT INTO routes (route_id, route_short_name, route_long_name, route_type) VALUES ($1, $2, $3, $4)',
-        [r.route_id, r.route_short_name, r.route_long_name, r.route_type]
-      );
+    // Batch insert routes
+    if (routes.length > 0) {
+      const routeValues = [];
+      const routeParams = [];
+      let paramIdx = 1;
+      for (const r of routes) {
+        routeValues.push(`($${paramIdx}, $${paramIdx+1}, $${paramIdx+2}, $${paramIdx+3})`);
+        routeParams.push(r.route_id, r.route_short_name, r.route_long_name, r.route_type);
+        paramIdx += 4;
+      }
+      const routeInsertQuery = `INSERT INTO routes (route_id, route_short_name, route_long_name, route_type) VALUES ${routeValues.join(',')}`;
+      await pool.query(routeInsertQuery, routeParams);
     }
   }
   console.log(`Ingested ${stops.length} stops and ${routes.length} routes.`);
