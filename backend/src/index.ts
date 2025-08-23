@@ -1,25 +1,31 @@
 import express, { Request, Response } from 'express';
-import fs from 'fs';
-import path from 'path';
+import { pool, redisClient } from './db';
 
 export const app = express();
 const port = process.env.PORT || 3001;
 
-const DATA_DIR = path.join(__dirname, '..', 'data');
-
-function loadJson(filename: string) {
+async function query<T>(sql: string, params: any[] = []): Promise<T[]> {
+  if (!pool) return [];
   try {
-    return JSON.parse(
-      fs.readFileSync(path.join(DATA_DIR, filename), 'utf-8')
-    );
-  } catch {
+    const { rows } = await pool.query(sql, params);
+    return rows as T[];
+  } catch (err) {
+    console.error(err);
     return [];
   }
 }
 
-const stops = loadJson('stops.json');
-const routes = loadJson('routes.json');
-const vehicles = loadJson('vehicles.json');
+async function getVehicles() {
+  if (redisClient) {
+    const cached = await redisClient.get('vehicles');
+    if (cached) return JSON.parse(cached);
+  }
+  const vehicles = await query<any>('SELECT * FROM vehicles');
+  if (redisClient && vehicles.length) {
+    await redisClient.set('vehicles', JSON.stringify(vehicles), { EX: 30 });
+  }
+  return vehicles;
+}
 
 function toRad(deg: number) {
   return (deg * Math.PI) / 180;
@@ -43,27 +49,34 @@ app.get('/', (_req: Request, res: Response) => {
   res.send('Cyprus Bus Stop API');
 });
 
-app.get('/stops', (_req: Request, res: Response) => {
+app.get('/stops', async (_req: Request, res: Response) => {
+  const stops = await query<any>('SELECT * FROM stops');
   res.json(stops);
 });
 
-app.get('/routes', (_req: Request, res: Response) => {
+app.get('/routes', async (_req: Request, res: Response) => {
+  const routes = await query<any>('SELECT * FROM routes');
   res.json(routes);
 });
 
-app.get('/vehicles', (_req: Request, res: Response) => {
+app.get('/vehicles', async (_req: Request, res: Response) => {
+  const vehicles = await getVehicles();
   res.json(vehicles);
 });
 
-app.get('/arrivals/:stopId', (req: Request, res: Response) => {
+app.get('/arrivals/:stopId', async (req: Request, res: Response) => {
   const stopId = req.params.stopId;
-  const stop = stops.find((s: any) => s.stop_id === stopId);
-  if (!stop) {
+  const stops = await query<any>('SELECT * FROM stops WHERE stop_id = $1', [
+    stopId,
+  ]);
+  if (!stops.length) {
     return res.status(404).json({ error: 'Stop not found' });
   }
+  const stop = stops[0];
   const stopLat = parseFloat(stop.stop_lat);
   const stopLon = parseFloat(stop.stop_lon);
   const SPEED_METERS_PER_MIN = 250; // ~15 km/h
+  const vehicles = await getVehicles();
   const arrivals = vehicles
     .map((v: any) => {
       const dist = distanceMeters(stopLat, stopLon, v.lat, v.lon);

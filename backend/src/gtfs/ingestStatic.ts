@@ -1,19 +1,12 @@
 import fetch from 'node-fetch';
 import unzipper from 'unzipper';
 import csvParser from 'csv-parser';
-import fs from 'fs';
-import path from 'path';
+import { pool } from '../db';
 
 const GTFS_STATIC_URL = process.env.GTFS_STATIC_URL || '';
 if (!GTFS_STATIC_URL) {
   console.error('GTFS_STATIC_URL environment variable not set');
   process.exit(1);
-}
-
-const DATA_DIR = path.join(__dirname, '..', '..', 'data');
-
-async function ensureDataDir() {
-  await fs.promises.mkdir(DATA_DIR, { recursive: true });
 }
 
 async function parseCsvFromZip(zip: unzipper.CentralDirectory, filename: string): Promise<any[]> {
@@ -45,9 +38,22 @@ async function ingest() {
     parseCsvFromZip(zip, 'routes.txt')
   ]);
 
-  await ensureDataDir();
-  await fs.promises.writeFile(path.join(DATA_DIR, 'stops.json'), JSON.stringify(stops, null, 2));
-  await fs.promises.writeFile(path.join(DATA_DIR, 'routes.json'), JSON.stringify(routes, null, 2));
+  if (pool) {
+    await pool.query('DELETE FROM stops');
+    await pool.query('DELETE FROM routes');
+    for (const s of stops) {
+      await pool.query(
+        'INSERT INTO stops (stop_id, stop_name, stop_lat, stop_lon) VALUES ($1, $2, $3, $4)',
+        [s.stop_id, s.stop_name, s.stop_lat, s.stop_lon]
+      );
+    }
+    for (const r of routes) {
+      await pool.query(
+        'INSERT INTO routes (route_id, route_short_name, route_long_name, route_type) VALUES ($1, $2, $3, $4)',
+        [r.route_id, r.route_short_name, r.route_long_name, r.route_type]
+      );
+    }
+  }
   console.log(`Ingested ${stops.length} stops and ${routes.length} routes.`);
 }
 
