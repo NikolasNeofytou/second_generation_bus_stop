@@ -6,19 +6,20 @@ a GTFS‑RT real‑time feed.
 
 ## Overview
 - **Server**: `src/index.ts` creates an Express app and serves bus stop, route,
-  vehicle and arrival information.
+  vehicle, alert and arrival information.
 - **Ingestion Scripts**:
   - `src/gtfs/ingestStatic.ts` downloads a GTFS ZIP, extracts `stops.txt` and
     `routes.txt`, and stores them as JSON under `data/`.
   - `src/gtfs/ingestRealtime.ts` fetches a GTFS‑RT feed and writes vehicle
-    positions to `data/vehicles.json`.
-- **Data Loading**: The server reads JSON from `data/` at startup. Missing files
-  result in empty arrays so the API remains responsive.
+    positions and alerts to `data/vehicles.json` and `data/alerts.json`.
+- **Data Loading**: The server reads JSON from `data/` at startup. Alerts are
+  cached in memory for 60 seconds when served.
 - **Endpoints**:
   - `GET /` – health message.
   - `GET /stops` – list of all stops.
   - `GET /routes` – list of routes.
   - `GET /vehicles` – latest vehicle positions.
+  - `GET /alerts` – latest service alerts (cached for 60s).
   - `GET /arrivals/:stopId` – approximate ETAs for a stop based on vehicle
     distance calculations.
 
@@ -31,7 +32,7 @@ a GTFS‑RT real‑time feed.
    ```bash
    GTFS_STATIC_URL=<feed_url> npm run ingest:gtfs
    ```
-3. Ingest real‑time vehicle positions:
+3. Ingest real‑time vehicle positions and alerts:
    ```bash
    GTFS_RT_URL=<feed_url> npm run ingest:gtfs-rt
    ```

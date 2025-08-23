@@ -27,6 +27,10 @@ async function getVehicles() {
   return vehicles;
 }
 
+const ALERTS_TTL_MS = 60 * 1000;
+let alertsCache: any[] = [];
+let alertsCacheTime = 0;
+
 function toRad(deg: number) {
   return (deg * Math.PI) / 180;
 }
@@ -64,7 +68,18 @@ app.get('/vehicles', async (_req: Request, res: Response) => {
   res.json(vehicles);
 });
 
-app.get('/arrivals/:stopId', async (req: Request, res: Response) => {
+
+app.get('/alerts', (_req: Request, res: Response) => {
+  const now = Date.now();
+  if (now - alertsCacheTime > ALERTS_TTL_MS) {
+    alertsCache = loadJson('alerts.json');
+    alertsCacheTime = now;
+  }
+  res.json(alertsCache);
+});
+
+app.get('/arrivals/:stopId', (req: Request, res: Response) => {
+
   const stopId = req.params.stopId;
   const stops = await query<any>('SELECT * FROM stops WHERE stop_id = $1', [
     stopId,
