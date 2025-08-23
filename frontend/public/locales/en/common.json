@@ -2,6 +2,11 @@
   "title": "Cyprus Bus Stop",
   "heading": "Cyprus Bus Stop App",
   "comingSoon": "Coming soon...",
+
+  "loadingVehicles": "Loading vehicles...",
+  "noVehicles": "No vehicles available",
+
+
   "english": "English",
   "greek": "Ελληνικά"
 }

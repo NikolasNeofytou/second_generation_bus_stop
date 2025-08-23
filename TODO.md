@@ -19,8 +19,9 @@
 | Task | Status |
 | --- | --- |
 | Initialize Next.js app | Done |
-| Alerts banner | Done |
-| Map view with real-time vehicles | Not Started |
+
+| Map view with real-time vehicles | Done |
+
 | Stop and route search | Not Started |
 | Favourites | Not Started |
 | PWA offline support | Not Started |

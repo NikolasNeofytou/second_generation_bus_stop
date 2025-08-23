@@ -1,7 +1,18 @@
 import Head from 'next/head';
 import React from 'react';
 
-import AlertsBanner from '../components/AlertsBanner';
+
+import dynamic from 'next/dynamic';
+import { useTranslation } from 'next-i18next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import LanguageSwitcher from '../components/LanguageSwitcher';
+
+
+const MapView = dynamic(() => import('../components/MapView'), { ssr: false });
+
+
+
+
 
 
 export default function Home() {
@@ -14,8 +25,13 @@ export default function Home() {
       <AlertsBanner />
       <main>
         <h1>{t('heading')}</h1>
-        <p>{t('comingSoon')}</p>
+
         <LanguageSwitcher />
+        <MapView />
+
+        
+        
+
       </main>
     </>
   );
