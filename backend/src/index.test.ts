@@ -14,6 +14,19 @@ describe('API endpoints', () => {
     expect(Array.isArray(res.body)).toBe(true);
   });
 
+  it('returns array for /alerts', async () => {
+    const res = await request(app).get('/alerts');
+    expect(res.status).toBe(200);
+    expect(Array.isArray(res.body)).toBe(true);
+  });
+
+  it('returns firmware info', async () => {
+    const res = await request(app).get('/firmware/latest');
+    expect(res.status).toBe(200);
+    expect(res.body).toHaveProperty('version');
+    expect(res.body).toHaveProperty('url');
+  });
+
   it('returns 404 for unknown stop arrivals', async () => {
     const res = await request(app).get('/arrivals/unknown');
     expect(res.status).toBe(404);

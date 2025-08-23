@@ -6,9 +6,11 @@
 | Set up Express TypeScript server | Done |
 | GTFS static data ingestion pipeline | Done |
 | GTFS-RT feed listener | Done |
+| GTFS-RT alerts ingestion | Done |
 | REST API: stops endpoint | Done |
 | REST API: routes endpoint | Done |
 | REST API: vehicles endpoint | Done |
+| REST API: alerts endpoint | Done |
 | REST API: arrivals endpoint | Done |
 | Unit and integration tests | Done |
 | Architecture & setup guide | Done |
@@ -17,9 +19,10 @@
 | Task | Status |
 | --- | --- |
 | Initialize Next.js app | Done |
-| Map view with real-time vehicles | Not Started |
+| Alerts banner | Done |
+| Map view with real-time vehicles | Done |
 | Stop and route search | Not Started |
-| Favourites & alerts | Not Started |
+| Favourites | Not Started |
 | PWA offline support | Not Started |
 
 ## Infrastructure
@@ -28,3 +31,13 @@
 | Dockerize services | Not Started |
 | CI/CD pipeline | Not Started |
 | Monitoring and logging | Not Started |
+
+## Firmware
+| Task | Status |
+| --- | --- |
+| Boot & configuration | Done |
+| Networking & sync | Done |
+| Display logic | Done |
+| Offline & error states | Done |
+| Maintainability & OTA updates | Done |
+| Security & hardening | Done |

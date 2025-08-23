@@ -20,6 +20,14 @@ function loadJson(filename: string) {
 const stops = loadJson('stops.json');
 const routes = loadJson('routes.json');
 const vehicles = loadJson('vehicles.json');
+const firmwareInfo = {
+  version: '0.1.0',
+  url: 'https://example.com/firmware.bin',
+};
+
+const ALERTS_TTL_MS = 60 * 1000;
+let alertsCache: any[] = [];
+let alertsCacheTime = 0;
 
 function toRad(deg: number) {
   return (deg * Math.PI) / 180;
@@ -53,6 +61,19 @@ app.get('/routes', (_req: Request, res: Response) => {
 
 app.get('/vehicles', (_req: Request, res: Response) => {
   res.json(vehicles);
+});
+
+app.get('/firmware/latest', (_req: Request, res: Response) => {
+  res.json(firmwareInfo);
+});
+
+app.get('/alerts', (_req: Request, res: Response) => {
+  const now = Date.now();
+  if (now - alertsCacheTime > ALERTS_TTL_MS) {
+    alertsCache = loadJson('alerts.json');
+    alertsCacheTime = now;
+  }
+  res.json(alertsCache);
 });
 
 app.get('/arrivals/:stopId', (req: Request, res: Response) => {

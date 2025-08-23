@@ -33,12 +33,34 @@ async function ingestRealtime() {
       timestamp: e.vehicle!.timestamp ? Number(e.vehicle!.timestamp) : undefined
     }));
 
+  const alerts = feed.entity
+    .filter(e => e.alert)
+    .map(e => {
+      const alert = e.alert!;
+      const header = alert.header_text?.translation?.[0]?.text;
+      const description = alert.description_text?.translation?.[0]?.text;
+      const url = alert.url?.translation?.[0]?.text;
+      return {
+        id: e.id,
+        header,
+        description,
+        url,
+        effect: alert.effect,
+        severity: alert.severity_level,
+      };
+    });
+
   await ensureDataDir();
   await fs.promises.writeFile(
     path.join(DATA_DIR, 'vehicles.json'),
     JSON.stringify(vehicles, null, 2)
   );
+  await fs.promises.writeFile(
+    path.join(DATA_DIR, 'alerts.json'),
+    JSON.stringify(alerts, null, 2)
+  );
   console.log(`Ingested ${vehicles.length} vehicle positions.`);
+  console.log(`Ingested ${alerts.length} alerts.`);
 }
 
 if (require.main === module) {
