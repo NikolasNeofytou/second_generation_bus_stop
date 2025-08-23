@@ -1,18 +1,11 @@
 import fetch from 'node-fetch';
-import fs from 'fs';
-import path from 'path';
 import { transit_realtime } from 'gtfs-realtime-bindings';
+import { pool, redisClient } from '../db';
 
 const GTFS_RT_URL = process.env.GTFS_RT_URL || '';
 if (!GTFS_RT_URL) {
   console.error('GTFS_RT_URL environment variable not set');
   process.exit(1);
-}
-
-const DATA_DIR = path.join(__dirname, '..', '..', 'data');
-
-async function ensureDataDir() {
-  await fs.promises.mkdir(DATA_DIR, { recursive: true });
 }
 
 async function ingestRealtime() {
@@ -33,11 +26,18 @@ async function ingestRealtime() {
       timestamp: e.vehicle!.timestamp ? Number(e.vehicle!.timestamp) : undefined
     }));
 
-  await ensureDataDir();
-  await fs.promises.writeFile(
-    path.join(DATA_DIR, 'vehicles.json'),
-    JSON.stringify(vehicles, null, 2)
-  );
+  if (pool) {
+    await pool.query('DELETE FROM vehicles');
+    for (const v of vehicles) {
+      await pool.query(
+        'INSERT INTO vehicles (id, lat, lon, bearing, timestamp) VALUES ($1, $2, $3, $4, $5)',
+        [v.id, v.lat, v.lon, v.bearing, v.timestamp]
+      );
+    }
+  }
+  if (redisClient) {
+    await redisClient.set('vehicles', JSON.stringify(vehicles), { EX: 30 });
+  }
   console.log(`Ingested ${vehicles.length} vehicle positions.`);
 }
 
