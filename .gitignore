@@ -1,0 +1,5 @@
+node_modules
+backend/data
+frontend/.next
+dist
+.env
