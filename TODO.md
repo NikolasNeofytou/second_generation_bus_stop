@@ -10,7 +10,7 @@
 | REST API: routes endpoint | Done |
 | REST API: vehicles endpoint | Done |
 | REST API: arrivals endpoint | Done |
-| Unit and integration tests | Not Started |
+| Unit and integration tests | In Progress |
 
 ## Frontend
 | Task | Status |

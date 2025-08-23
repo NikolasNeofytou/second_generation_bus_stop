@@ -1,8 +1,8 @@
-import express from 'express';
+import express, { Request, Response } from 'express';
 import fs from 'fs';
 import path from 'path';
 
-const app = express();
+export const app = express();
 const port = process.env.PORT || 3001;
 
 const DATA_DIR = path.join(__dirname, '..', 'data');
@@ -39,23 +39,23 @@ function distanceMeters(lat1: number, lon1: number, lat2: number, lon2: number) 
   return R * c;
 }
 
-app.get('/', (_req, res) => {
+app.get('/', (_req: Request, res: Response) => {
   res.send('Cyprus Bus Stop API');
 });
 
-app.get('/stops', (_req, res) => {
+app.get('/stops', (_req: Request, res: Response) => {
   res.json(stops);
 });
 
-app.get('/routes', (_req, res) => {
+app.get('/routes', (_req: Request, res: Response) => {
   res.json(routes);
 });
 
-app.get('/vehicles', (_req, res) => {
+app.get('/vehicles', (_req: Request, res: Response) => {
   res.json(vehicles);
 });
 
-app.get('/arrivals/:stopId', (req, res) => {
+app.get('/arrivals/:stopId', (req: Request, res: Response) => {
   const stopId = req.params.stopId;
   const stop = stops.find((s: any) => s.stop_id === stopId);
   if (!stop) {
@@ -78,6 +78,8 @@ app.get('/arrivals/:stopId', (req, res) => {
   res.json(arrivals);
 });
 
-app.listen(port, () => {
-  console.log(`Backend server listening on port ${port}`);
-});
+if (require.main === module) {
+  app.listen(port, () => {
+    console.log(`Backend server listening on port ${port}`);
+  });
+}
