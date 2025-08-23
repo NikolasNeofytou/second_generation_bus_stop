@@ -1,18 +1,11 @@
 import fetch from 'node-fetch';
-import fs from 'fs';
-import path from 'path';
 import { transit_realtime } from 'gtfs-realtime-bindings';
+import { pool, redisClient } from '../db';
 
 const GTFS_RT_URL = process.env.GTFS_RT_URL || '';
 if (!GTFS_RT_URL) {
   console.error('GTFS_RT_URL environment variable not set');
   process.exit(1);
-}
-
-const DATA_DIR = path.join(__dirname, '..', '..', 'data');
-
-async function ensureDataDir() {
-  await fs.promises.mkdir(DATA_DIR, { recursive: true });
 }
 
 async function ingestRealtime() {
@@ -32,6 +25,7 @@ async function ingestRealtime() {
       bearing: e.vehicle!.position!.bearing,
       timestamp: e.vehicle!.timestamp ? Number(e.vehicle!.timestamp) : undefined
     }));
+
 
   const alerts = feed.entity
     .filter(e => e.alert)
@@ -59,6 +53,7 @@ async function ingestRealtime() {
     path.join(DATA_DIR, 'alerts.json'),
     JSON.stringify(alerts, null, 2)
   );
+
   console.log(`Ingested ${vehicles.length} vehicle positions.`);
   console.log(`Ingested ${alerts.length} alerts.`);
 }
