@@ -13,4 +13,7 @@ To ingest a GTFS feed: `cd backend && GTFS_STATIC_URL=<feed_url> npm run ingest:
 - `backend/src/gtfs/ingestRealtime.ts`: fetches a GTFS-RT vehicle positions feed and writes vehicle positions to JSON
 To ingest a GTFS-RT feed: `cd backend && GTFS_RT_URL=<feed_url> npm run ingest:gtfs-rt`
 
+For a detailed overview of the backend architecture and setup, see
+[backend/README.md](backend/README.md).
+
 See [TODO.md](TODO.md) for the full roadmap.

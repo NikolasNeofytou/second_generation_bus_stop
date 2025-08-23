@@ -5,12 +5,13 @@
 | --- | --- |
 | Set up Express TypeScript server | Done |
 | GTFS static data ingestion pipeline | Done |
-| GTFS-RT feed listener | In Progress |
+| GTFS-RT feed listener | Done |
 | REST API: stops endpoint | Done |
 | REST API: routes endpoint | Done |
 | REST API: vehicles endpoint | Done |
 | REST API: arrivals endpoint | Done |
-| Unit and integration tests | In Progress |
+| Unit and integration tests | Done |
+| Architecture & setup guide | Done |
 
 ## Frontend
 | Task | Status |
