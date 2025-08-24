@@ -9,6 +9,7 @@ const SIRI_HEADERS = process.env.SIRI_HEADERS ? JSON.parse(process.env.SIRI_HEAD
 const SIRI_METHOD = (process.env.SIRI_METHOD || 'GET').toUpperCase(); // GET | SOAP_VM
 const SIRI_SOAP_ACTION = process.env.SIRI_SOAP_ACTION; // optional; defaulted per op
 const SIRI_OPERATION = (process.env.SIRI_OPERATION || 'VehicleMonitoring');
+const SIRI_SERVICE_NS = process.env.SIRI_SERVICE_NS || 'http://www.siri.org.uk/siri';
 const SIRI_SOAP_BODY = process.env.SIRI_SOAP_BODY; // optional manual override
 const SIRI_DEBUG = (process.env.SIRI_DEBUG || 'false').toLowerCase() === 'true';
 const SIRI_REQUESTOR_REF = process.env.SIRI_REQUESTOR_REF || 'demo';
@@ -43,11 +44,11 @@ export async function ingestSIRI() {
     const lineFilter = SIRI_LINE_REF ? `<LineRef>${SIRI_LINE_REF}</LineRef>` : '';
     const opFilter = SIRI_OPERATOR_REF ? `<OperatorRef>${SIRI_OPERATOR_REF}</OperatorRef>` : '';
     const opName = SIRI_OPERATION === 'EstimatedTimetable' ? 'GetEstimatedTimetable' : 'GetVehicleMonitoring';
-    const defaultBody = SIRI_OPERATION === 'EstimatedTimetable'
+  const defaultBody = SIRI_OPERATION === 'EstimatedTimetable'
       ? `<?xml version="1.0" encoding="utf-8"?>
 <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
   <soap:Body>
-    <GetEstimatedTimetable xmlns="http://www.siri.org.uk/siri">
+  <GetEstimatedTimetable xmlns="${SIRI_SERVICE_NS}">
       <Request>
         <RequestTimestamp>${now}</RequestTimestamp>
         <RequestorRef>${SIRI_REQUESTOR_REF}</RequestorRef>
@@ -61,7 +62,7 @@ export async function ingestSIRI() {
       : `<?xml version="1.0" encoding="utf-8"?>
 <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
   <soap:Body>
-    <GetVehicleMonitoring xmlns="http://www.siri.org.uk/siri">
+  <GetVehicleMonitoring xmlns="${SIRI_SERVICE_NS}">
       <Request>
         <RequestTimestamp>${now}</RequestTimestamp>
         <RequestorRef>${SIRI_REQUESTOR_REF}</RequestorRef>
