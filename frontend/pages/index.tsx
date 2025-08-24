@@ -6,6 +6,7 @@ import dynamic from 'next/dynamic';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import LanguageSwitcher from '../components/LanguageSwitcher';
+import AlertsBanner from '../components/AlertsBanner';
 
 
 const MapView = dynamic(() => import('../components/MapView'), { ssr: false });

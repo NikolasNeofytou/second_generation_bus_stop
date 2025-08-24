@@ -25,17 +25,20 @@ const DEFAULT_CENTER: [number, number] = [35.1264, 33.4299];
 export default function MapView() {
   const { t } = useTranslation('common');
   const [vehicles, setVehicles] = useState<Vehicle[] | null>(null);
+  const [stale, setStale] = useState(false);
 
   useEffect(() => {
     const fetchVehicles = async () => {
       try {
         const res = await fetch('http://localhost:3001/vehicles');
+        setStale(res.headers.get('X-Cache') === 'HIT');
         if (res.ok) {
           setVehicles(await res.json());
         } else {
           setVehicles([]);
         }
       } catch {
+        setStale(true);
         setVehicles([]);
       }
     };
@@ -50,6 +53,7 @@ export default function MapView() {
       {vehicles !== null && vehicles.length === 0 && (
         <p>{t('noVehicles')}</p>
       )}
+      {stale && <p style={{ color: 'red' }}>{t('offlineData')}</p>}
       <MapContainer
         center={DEFAULT_CENTER}
         zoom={10}
