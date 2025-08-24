@@ -6,6 +6,7 @@ import { pool, redisClient } from './db';
 import { ticketsRouter } from './ticketing';
 
 import path from 'path';
+import { getStopMonitoring } from './siri/stopMonitoring';
 
 export const app = express();
 app.use(express.json());
@@ -123,14 +124,17 @@ app.get('/shapes', async (_req: Request, res: Response) => {
 });
 
 app.get('/arrivals/:stopId', async (req: Request, res: Response) => {
-
   const stopId = req.params.stopId;
-  const stops = await query<any>('SELECT * FROM stops WHERE stop_id = $1', [
-    stopId,
-  ]);
-  if (!stops.length) {
-    return res.status(404).json({ error: 'Stop not found' });
+  // Try SIRI StopMonitoring first (real arrivals if configured)
+  try {
+    const siriArrivals = await getStopMonitoring(stopId);
+    if (siriArrivals.length) return res.json(siriArrivals);
+  } catch (e) {
+    console.warn('SIRI StopMonitoring failed, falling back to distance ETA:', e instanceof Error ? e.message : e);
   }
+  // Fallback: compute ETAs from current vehicles and haversine distance
+  const stops = await query<any>('SELECT * FROM stops WHERE stop_id = $1', [ stopId ]);
+  if (!stops.length) return res.status(404).json({ error: 'Stop not found' });
   const stop = stops[0];
   const stopLat = parseFloat(stop.stop_lat);
   const stopLon = parseFloat(stop.stop_lon);
@@ -139,11 +143,7 @@ app.get('/arrivals/:stopId', async (req: Request, res: Response) => {
   const arrivals = vehicles
     .map((v: any) => {
       const dist = distanceMeters(stopLat, stopLon, v.lat, v.lon);
-      return {
-        vehicleId: v.id,
-        distance: dist,
-        etaMinutes: dist / SPEED_METERS_PER_MIN,
-      };
+      return { vehicleId: v.id, distance: dist, etaMinutes: dist / SPEED_METERS_PER_MIN };
     })
     .sort((a: any, b: any) => a.etaMinutes - b.etaMinutes)
     .slice(0, 5);
