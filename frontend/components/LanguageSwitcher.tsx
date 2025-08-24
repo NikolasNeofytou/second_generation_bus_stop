@@ -1,22 +1,22 @@
 import { useRouter } from 'next/router';
-import { useTranslation } from 'next-i18next';
+import useTranslation from 'next-translate/useTranslation';
+import setLanguage from 'next-translate/setLanguage';
 
 const LanguageSwitcher: React.FC = () => {
   const router = useRouter();
-  const { locale, asPath } = router;
-  const { t } = useTranslation('common');
+  const { t, lang } = useTranslation('common');
 
-  const changeLanguage = (lng: string) => {
+  const changeLanguage = async (lng: string) => {
     localStorage.setItem('locale', lng);
-    router.push(asPath, asPath, { locale: lng });
+    await setLanguage(lng);
   };
 
   return (
     <div>
-      <button disabled={locale === 'en'} onClick={() => changeLanguage('en')}>
+      <button disabled={lang === 'en'} onClick={() => changeLanguage('en')}>
         {t('english')}
       </button>
-      <button disabled={locale === 'el'} onClick={() => changeLanguage('el')}>
+      <button disabled={lang === 'el'} onClick={() => changeLanguage('el')}>
         {t('greek')}
       </button>
     </div>

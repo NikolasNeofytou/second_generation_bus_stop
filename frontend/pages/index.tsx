@@ -1,19 +1,12 @@
 import Head from 'next/head';
 import React from 'react';
-
-
 import dynamic from 'next/dynamic';
-import { useTranslation } from 'next-i18next';
-import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import useTranslation from 'next-translate/useTranslation';
 import LanguageSwitcher from '../components/LanguageSwitcher';
-
+import AlertsBanner from '../components/AlertsBanner';
+import StopSearch from '../components/StopSearch';
 
 const MapView = dynamic(() => import('../components/MapView'), { ssr: false });
-
-
-
-
-
 
 export default function Home() {
   const { t } = useTranslation('common');
@@ -25,22 +18,10 @@ export default function Home() {
       <AlertsBanner />
       <main>
         <h1>{t('heading')}</h1>
-
         <LanguageSwitcher />
+        <StopSearch stops={[]} />
         <MapView />
-
-        
-        
-
       </main>
     </>
   );
-}
-
-export async function getStaticProps({ locale }) {
-  return {
-    props: {
-      ...(await serverSideTranslations(locale, ['common'])),
-    },
-  };
 }

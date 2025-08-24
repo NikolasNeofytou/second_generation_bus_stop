@@ -1,10 +1,24 @@
 import express, { Request, Response } from 'express';
 import fs from 'fs';
 import { pool, redisClient } from './db';
+import fs from 'fs';
+import path from 'path';
 
 export const app = express();
 app.use(express.json());
 const port = process.env.PORT || 3001;
+const DATA_DIR = path.join(__dirname, '..', '..', 'data');
+
+function loadJson(fileName: string): any[] {
+  try {
+    const filePath = path.join(DATA_DIR, fileName);
+    const data = fs.readFileSync(filePath, 'utf-8');
+    return JSON.parse(data);
+  } catch (err) {
+    console.error(`Failed to load ${fileName}`, err);
+    return [];
+  }
+}
 
 function loadJson(file: string) {
   try {
@@ -91,6 +105,7 @@ app.get('/alerts', (_req: Request, res: Response) => {
 });
 
 app.get('/arrivals/:stopId', async (req: Request, res: Response) => {
+
   const stopId = req.params.stopId;
   const stops = await query<any>('SELECT * FROM stops WHERE stop_id = $1', [
     stopId,

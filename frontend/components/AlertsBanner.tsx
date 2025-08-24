@@ -1,17 +1,19 @@
 import React, { useEffect, useState } from 'react';
+import useTranslation from 'next-translate/useTranslation';
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3001';
 
 interface Alert {
   id: string;
-  header?: string;
-  description?: string;
+  headerTranslations?: Record<string, string>;
+  descriptionTranslations?: Record<string, string>;
   url?: string;
 }
 
 export default function AlertsBanner() {
   const [alerts, setAlerts] = useState<Alert[]>([]);
   const [alertsError, setAlertsError] = useState<string | null>(null);
+  const { t, lang } = useTranslation('common');
 
   useEffect(() => {
     const url = `${BACKEND_URL}/alerts`;
@@ -25,7 +27,7 @@ export default function AlertsBanner() {
       .then(setAlerts)
       .catch(err => {
         console.error(`Failed to load alerts from ${url}:`, err);
-        setAlertsError('Could not load alerts. Please try again later.');
+        setAlertsError(t('alertsError'));
       });
   }, []);
 
@@ -44,7 +46,10 @@ export default function AlertsBanner() {
     <div style={{ backgroundColor: '#ffecb3', padding: '0.5rem' }}>
       {alerts.map(alert => (
         <div key={alert.id}>
-          <strong>{alert.header}</strong> {alert.description}
+          <strong>{alert.headerTranslations?.[lang] || alert.headerTranslations?.['en']}</strong>
+          {' '}
+          {alert.descriptionTranslations?.[lang] ||
+            alert.descriptionTranslations?.['en']}
         </div>
       ))}
     </div>
