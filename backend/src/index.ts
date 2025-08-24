@@ -1,8 +1,20 @@
 import express, { Request, Response } from 'express';
+import fs from 'fs';
 import { pool, redisClient } from './db';
 
 export const app = express();
+app.use(express.json());
 const port = process.env.PORT || 3001;
+
+function loadJson(file: string) {
+  try {
+    const data = fs.readFileSync(file, 'utf8');
+    return JSON.parse(data);
+  } catch (err) {
+    console.error(err);
+    return [];
+  }
+}
 
 async function query<T>(sql: string, params: any[] = []): Promise<T[]> {
   if (!pool) return [];
@@ -78,8 +90,7 @@ app.get('/alerts', (_req: Request, res: Response) => {
   res.json(alertsCache);
 });
 
-app.get('/arrivals/:stopId', (req: Request, res: Response) => {
-
+app.get('/arrivals/:stopId', async (req: Request, res: Response) => {
   const stopId = req.params.stopId;
   const stops = await query<any>('SELECT * FROM stops WHERE stop_id = $1', [
     stopId,
@@ -104,6 +115,32 @@ app.get('/arrivals/:stopId', (req: Request, res: Response) => {
     .sort((a: any, b: any) => a.etaMinutes - b.etaMinutes)
     .slice(0, 5);
   res.json(arrivals);
+});
+
+interface BoardStatus {
+  uptime: number;
+  firmwareVersion: string;
+  timestamp: number;
+}
+
+const boardStatuses: BoardStatus[] = [];
+
+app.post('/board-status', (req: Request, res: Response) => {
+  const { uptime, firmwareVersion } = req.body || {};
+  if (typeof uptime !== 'number' || typeof firmwareVersion !== 'string') {
+    return res.status(400).json({ error: 'Invalid status payload' });
+  }
+  const status: BoardStatus = {
+    uptime,
+    firmwareVersion,
+    timestamp: Date.now(),
+  };
+  boardStatuses.push(status);
+  res.status(201).json(status);
+});
+
+app.get('/board-status', (_req: Request, res: Response) => {
+  res.json(boardStatuses);
 });
 
 if (require.main === module) {

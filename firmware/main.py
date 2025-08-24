@@ -3,10 +3,15 @@ import network
 import socket
 import machine
 import os
+import time
+import urequests
 
 CONFIG_FILE = "config.json"
 AP_SSID = "BusStopSetup"
 AP_PASSWORD = "config123"
+STATUS_URL = "http://localhost:3001/board-status"
+FIRMWARE_VERSION = "1.0.0"
+STATUS_INTERVAL = 60000  # milliseconds
 
 
 def load_config() -> dict:
@@ -78,8 +83,24 @@ def main():
         cfg = start_config_portal()
     else:
         cfg = load_config()
-    # at this point, configuration is available in cfg
-    # subsequent startup logic would go here
+    wlan = network.WLAN(network.STA_IF)
+    wlan.active(True)
+    wlan.connect(cfg.get("ssid", ""), cfg.get("password", ""))
+    while not wlan.isconnected():
+        time.sleep(1)
+
+    while True:
+        try:
+            urequests.post(
+                STATUS_URL,
+                json={
+                    "uptime": time.ticks_ms() // 1000,
+                    "firmwareVersion": FIRMWARE_VERSION,
+                },
+            )
+        except Exception as e:
+            print("status error", e)
+        time.sleep_ms(STATUS_INTERVAL)
 
 
 if __name__ == "__main__":
