@@ -15,8 +15,13 @@ This frontend uses **next-i18next** for internationalization.
 2. Create `public/locales/<locale>/common.json` with the necessary keys.
 3. If needed, update UI elements like the language switcher.
 
-### Development
+## Development
 ```bash
 npm install
 npm run dev
 ```
+
+
+## Styling
+
+The app uses Tailwind CSS. Global styles live in `styles/globals.css` and Tailwind is configured via `tailwind.config.js`.

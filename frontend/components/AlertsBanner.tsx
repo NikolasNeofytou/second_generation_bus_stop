@@ -33,8 +33,10 @@ export default function AlertsBanner() {
 
   if (alertsError) {
     return (
-      <div style={{ backgroundColor: '#ffcccc', padding: '0.5rem', color: '#900' }}>
-        {alertsError}
+      <div className="bg-red-50 text-red-800 dark:bg-red-900/40 dark:text-red-200 border-y border-red-200 dark:border-red-800">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 text-sm">
+          {alertsError}
+        </div>
       </div>
     );
   }
@@ -43,15 +45,19 @@ export default function AlertsBanner() {
   }
 
   return (
-    <div style={{ backgroundColor: '#ffecb3', padding: '0.5rem' }}>
-      {alerts.map(alert => (
-        <div key={alert.id}>
-          <strong>{alert.headerTranslations?.[lang] || alert.headerTranslations?.['en']}</strong>
-          {' '}
-          {alert.descriptionTranslations?.[lang] ||
-            alert.descriptionTranslations?.['en']}
-        </div>
-      ))}
+    <div className="bg-amber-50 text-amber-900 dark:bg-amber-900/40 dark:text-amber-100 border-y border-amber-200 dark:border-amber-800">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 text-sm space-y-1">
+        {alerts.map(alert => (
+          <div key={alert.id} className="flex items-start gap-2">
+            <span className="font-semibold">
+              {alert.headerTranslations?.[lang] || alert.headerTranslations?.['en']}
+            </span>
+            <span>
+              {alert.descriptionTranslations?.[lang] || alert.descriptionTranslations?.['en']}
+            </span>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

@@ -1,31 +1,27 @@
+import 'dotenv/config';
 import express, { Request, Response } from 'express';
+import cors from 'cors';
 import fs from 'fs';
 import { pool, redisClient } from './db';
-import fs from 'fs';
+import { ticketsRouter } from './ticketing';
+
 import path from 'path';
 
 export const app = express();
 app.use(express.json());
+app.use(cors());
 const port = process.env.PORT || 3001;
 const DATA_DIR = path.join(__dirname, '..', '..', 'data');
 
-function loadJson(fileName: string): any[] {
+
+
+function loadJson(fileName: string) {
   try {
     const filePath = path.join(DATA_DIR, fileName);
-    const data = fs.readFileSync(filePath, 'utf-8');
+    const data = fs.readFileSync(filePath, 'utf8');
     return JSON.parse(data);
   } catch (err) {
-    console.error(`Failed to load ${fileName}`, err);
-    return [];
-  }
-}
-
-function loadJson(file: string) {
-  try {
-    const data = fs.readFileSync(file, 'utf8');
-    return JSON.parse(data);
-  } catch (err) {
-    console.error(err);
+    console.error(`Failed to load ${fileName} from ${DATA_DIR}`, err);
     return [];
   }
 }
@@ -42,15 +38,22 @@ async function query<T>(sql: string, params: any[] = []): Promise<T[]> {
 }
 
 async function getVehicles() {
+  // Try Redis cache first
   if (redisClient) {
     const cached = await redisClient.get('vehicles');
     if (cached) return JSON.parse(cached);
   }
+  // Then DB
   const vehicles = await query<any>('SELECT * FROM vehicles');
-  if (redisClient && vehicles.length) {
-    await redisClient.set('vehicles', JSON.stringify(vehicles), { EX: 30 });
+  if (vehicles.length) {
+    if (redisClient) {
+      await redisClient.set('vehicles', JSON.stringify(vehicles), { EX: 30 });
+    }
+    return vehicles;
   }
-  return vehicles;
+  // Finally, fallback to file-based data for local/demo mode
+  const fileVehicles = loadJson('vehicles.json');
+  return Array.isArray(fileVehicles) ? fileVehicles : [];
 }
 
 const ALERTS_TTL_MS = 60 * 1000;
@@ -79,14 +82,22 @@ app.get('/', (_req: Request, res: Response) => {
   res.send('Cyprus Bus Stop API');
 });
 
+// Ticketing endpoints (dev/demo)
+app.use('/tickets', ticketsRouter);
+
 app.get('/stops', async (_req: Request, res: Response) => {
   const stops = await query<any>('SELECT * FROM stops');
-  res.json(stops);
+  if (stops.length) return res.json(stops);
+  // Fallback to file-based stops if DB is not configured
+  const fileStops = loadJson('stops.json');
+  return res.json(Array.isArray(fileStops) ? fileStops : []);
 });
 
 app.get('/routes', async (_req: Request, res: Response) => {
   const routes = await query<any>('SELECT * FROM routes');
-  res.json(routes);
+  if (routes.length) return res.json(routes);
+  const fileRoutes = loadJson('routes.json');
+  return res.json(Array.isArray(fileRoutes) ? fileRoutes : []);
 });
 
 app.get('/vehicles', async (_req: Request, res: Response) => {
@@ -102,6 +113,13 @@ app.get('/alerts', (_req: Request, res: Response) => {
     alertsCacheTime = now;
   }
   res.json(alertsCache);
+});
+
+// Shapes for route polylines
+app.get('/shapes', async (_req: Request, res: Response) => {
+  // DB support can be added later; for now serve file fallback
+  const fileShapes = loadJson('shapes.json');
+  return res.json(Array.isArray(fileShapes) ? fileShapes : []);
 });
 
 app.get('/arrivals/:stopId', async (req: Request, res: Response) => {

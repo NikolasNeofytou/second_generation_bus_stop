@@ -16,6 +16,12 @@
     "react-leaflet": "^4.2.1"
   },
   "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.12",
+    "@types/node": "24.3.0",
+    "autoprefixer": "^10.4.21",
+    "next-translate-plugin": "^2.6.2",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^4.1.12",
     "typescript": "^5.3.3"
   }
 }

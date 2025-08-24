@@ -12,11 +12,27 @@ const LanguageSwitcher: React.FC = () => {
   };
 
   return (
-    <div>
-      <button disabled={lang === 'en'} onClick={() => changeLanguage('en')}>
+    <div className="inline-flex items-center gap-2">
+      <button
+        className={`px-3 py-1.5 rounded-md text-sm border transition-colors ${
+          lang === 'en'
+            ? 'bg-gray-900 text-white dark:bg-gray-100 dark:text-gray-900 border-transparent'
+            : 'bg-white dark:bg-gray-900 border-gray-300 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800'
+        }`}
+        disabled={lang === 'en'}
+        onClick={() => changeLanguage('en')}
+      >
         {t('english')}
       </button>
-      <button disabled={lang === 'el'} onClick={() => changeLanguage('el')}>
+      <button
+        className={`px-3 py-1.5 rounded-md text-sm border transition-colors ${
+          lang === 'el'
+            ? 'bg-gray-900 text-white dark:bg-gray-100 dark:text-gray-900 border-transparent'
+            : 'bg-white dark:bg-gray-900 border-gray-300 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800'
+        }`}
+        disabled={lang === 'el'}
+        onClick={() => changeLanguage('el')}
+      >
         {t('greek')}
       </button>
     </div>
