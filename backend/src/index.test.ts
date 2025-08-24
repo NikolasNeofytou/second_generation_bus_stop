@@ -24,4 +24,13 @@ describe('API endpoints', () => {
     const res = await request(app).get('/arrivals/unknown');
     expect(res.status).toBe(404);
   });
+
+  it('accepts board status reports', async () => {
+    const payload = { uptime: 42, firmwareVersion: '1.0.0' };
+    const postRes = await request(app).post('/board-status').send(payload);
+    expect(postRes.status).toBe(201);
+    const getRes = await request(app).get('/board-status');
+    expect(getRes.status).toBe(200);
+    expect(getRes.body[0]).toMatchObject(payload);
+  });
 });
